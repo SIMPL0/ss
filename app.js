@@ -1,75 +1,100 @@
-// Registra Service Worker para PWA
+// =================================================================
+// 1. Configuração do PWA (Service Worker)
+// =================================================================
 if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-        .then(() => console.log('Service Worker registrado'))
-        .catch(error => console.log('Falha no registro do SW:', error));
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+            .then(registration => console.log('Service Worker registrado com sucesso:', registration.scope))
+            .catch(error => console.error('Falha no registro do SW:', error));
+    });
 }
 
-// Animação da tela inicial
-document.addEventListener('DOMContentLoaded', () => {
-    // ... Código de inicialização ...
-});
+// =================================================================
+// 2. Variáveis e Seletores
+// =================================================================
+const welcomeScreen = document.getElementById('welcomeScreen');
+const dashboard = document.getElementById('dashboard');
+const authForm = document.getElementById('authForm');
+const authContainer = document.getElementById('authContainer');
+const passwordFields = document.getElementById('passwordFields');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('password');
+const confirmPasswordInput = document.getElementById('confirmPassword');
+const tabButtons = document.querySelectorAll('.tabs .tab');
+const inputTypeLabels = document.querySelectorAll('.input-tabs .tab-label');
+const contentSections = document.querySelectorAll('.content-section');
+const navItems = document.querySelectorAll('.bottom-nav .nav-item');
+const coachInstructionsContainer = document.getElementById('coachInstructions');
+const chatBox = document.getElementById('chatBox');
+const messageInput = document.getElementById('messageInput');
+const metricsDateInput = document.getElementById('metricsDate');
+const weightInput = document.getElementById('weight');
+const metricsListContainer = document.getElementById('metricsList');
+const totalDaysSpan = document.getElementById('totalDays');
+const totalWeightSpan = document.getElementById('totalWeight');
 
-// Função para alternar entre login/cadastro
+// =================================================================
+// 3. Funções de Autenticação e Navegação
+// =================================================================
+
+/**
+ * Alterna entre as abas de Login e Cadastro.
+ * @param {string} tab - 'login' ou 'register'
+ */
 function switchTab(tab) {
-    const registerFields = document.getElementById('passwordFields');
-    const form = document.getElementById('authForm');
+    const isRegister = tab === 'register';
     
-    if (tab === 'register') {
-        registerFields.classList.remove('hidden');
+    if (isRegister) {
+        passwordFields.classList.remove('hidden');
     } else {
-        registerFields.classList.add('hidden');
+        passwordFields.classList.add('hidden');
     }
     
-    // Atualiza classes das tabs
-    const tabs = document.querySelectorAll('.tab');
-    tabs.forEach(tabElement => {
-        tabElement.classList.remove('active');
-        if ((tab === 'login' && tabElement.textContent === 'Entrar') || 
-            (tab === 'register' && tabElement.textContent === 'Cadastrar')) {
-            tabElement.classList.add('active');
+    tabButtons.forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.textContent.toLowerCase().includes(tab)) {
+            btn.classList.add('active');
         }
     });
 }
 
-// Função para alternar tipo de entrada (email/telefone)
+/**
+ * Alterna o tipo de input para E-mail ou Telefone.
+ * @param {string} type - 'email' ou 'phone'
+ */
 function switchInputType(type) {
-    const emailInput = document.getElementById('emailInput');
-    const labels = document.querySelectorAll('.tab-label');
-    
-    // Atualiza tipo do input
     emailInput.type = type === 'email' ? 'email' : 'tel';
     
-    // Atualiza classes das tabs
-    labels.forEach(label => {
+    inputTypeLabels.forEach(label => {
         label.classList.remove('active');
-        if (label.textContent.toLowerCase() === type) {
+        if (label.textContent.toLowerCase().includes(type)) {
             label.classList.add('active');
         }
     });
 }
 
-// Simulação de login/cadastro
-document.getElementById('authForm').addEventListener('submit', (e) => {
+/**
+ * Processa o envio do formulário de autenticação.
+ * @param {Event} e 
+ */
+function handleAuthSubmit(e) {
     e.preventDefault();
     
-    // Pega dados do formulário
-    const name = document.getElementById('name').value;
-    const emailOrPhone = document.getElementById('emailInput').value;
-    const isRegister = !document.getElementById('passwordFields').classList.contains('hidden');
+    const name = nameInput.value.trim();
+    const emailOrPhone = emailInput.value.trim();
+    const isRegister = !passwordFields.classList.contains('hidden');
     
     if (isRegister) {
-        // Processa cadastro
-        const password = document.getElementById('password').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        const password = passwordInput.value;
+        const confirmPassword = confirmPasswordInput.value;
         
-        // Valida senhas
         if (password !== confirmPassword) {
             alert('As senhas não coincidem!');
             return;
         }
         
-        // Simula armazenamento local
+        // Simula armazenamento local do usuário
         localStorage.setItem('user', JSON.stringify({
             name,
             emailOrPhone,
@@ -77,50 +102,67 @@ document.getElementById('authForm').addEventListener('submit', (e) => {
             registrationDate: new Date().toISOString()
         }));
         
-        // Atualiza interface
-        document.getElementById('authContainer').innerHTML = `
+        // Feedback de sucesso
+        authContainer.innerHTML = `
             <div class="registration-success">
-                <p>${name}, sua conta foi criada com sucesso!</p>
-                <button onclick="completeRegistration()">Entrar no App</button>
+                <p>Bem-vindo(a), ${name}! Sua conta foi criada com sucesso.</p>
+                <button id="completeRegistrationBtn" class="auth-btn">Entrar no App</button>
             </div>
         `;
+        document.getElementById('completeRegistrationBtn').addEventListener('click', completeRegistration);
     } else {
-        // Processa login
+        // Simula login
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
-            // Simula login bem-sucedido
-            document.getElementById('welcomeScreen').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
+            // Verifica se o nome/email/telefone corresponde (simulação simples)
+            const user = JSON.parse(storedUser);
+            if (user.emailOrPhone === emailOrPhone) {
+                completeRegistration();
+            } else {
+                alert('Credenciais inválidas. Verifique seu e-mail/telefone.');
+            }
         } else {
             alert('Usuário não encontrado! Tente se cadastrar primeiro.');
         }
     }
-});
-
-function completeRegistration() {
-    document.getElementById('welcomeScreen').classList.add('hidden');
-    document.getElementById('dashboard').classList.remove('hidden');
 }
 
-// Função para mostrar abas
-function showTab(tabId) {
-    // Esconde todas as abas
-    document.querySelectorAll('.content-section').forEach(section => {
+/**
+ * Finaliza o processo de autenticação e exibe o dashboard.
+ */
+function completeRegistration() {
+    welcomeScreen.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    // Carrega dados iniciais do dashboard
+    loadDashboardData();
+}
+
+/**
+ * Mostra a seção de conteúdo selecionada na navegação inferior.
+ * @param {string} tabId - ID da seção a ser exibida.
+ * @param {HTMLElement} target - O elemento de navegação clicado.
+ */
+function showTab(tabId, target) {
+    contentSections.forEach(section => {
         section.classList.add('hidden');
     });
     
-    // Mostra a aba selecionada
     document.getElementById(tabId).classList.remove('hidden');
     
-    // Atualiza estilo das abas inferior
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.style.transform = 'none';
+    // Atualiza o estilo do item de navegação
+    navItems.forEach(item => {
+        item.classList.remove('active');
     });
-    
-    event.currentTarget.style.transform = 'scale(1.1)';
+    target.classList.add('active');
 }
 
-// Simulação de dados do treinador
+// =================================================================
+// 4. Funções do Dashboard
+// =================================================================
+
+/**
+ * Carrega as instruções do treinador.
+ */
 function loadCoachInstructions() {
     const instructions = [
         {date: '2023-11-15', text: 'Hoje você deve concentrar-se na postura correta durante os exercícios de costas.'},
@@ -128,15 +170,17 @@ function loadCoachInstructions() {
         {date: '2023-11-17', text: 'Foco na alimentação: mais proteínas para recuperação muscular.'}
     ];
     
-    const container = document.getElementById('coachInstructions');
-    container.innerHTML = instructions.map(instr => `
+    coachInstructionsContainer.innerHTML = instructions.map(instr => `
         <li>
             <strong>${instr.date}</strong>: ${instr.text}
         </li>
     `).join('');
 }
 
-// Função para marcar treino como concluído
+/**
+ * Marca um dia de treino como concluído.
+ * @param {string} day - O dia da semana (ex: 'monday').
+ */
 function markAsCompleted(day) {
     const barElement = document.getElementById(day);
     barElement.classList.add('completed');
@@ -149,195 +193,243 @@ function markAsCompleted(day) {
     updateChartStats();
 }
 
-// Atualiza estatísticas do gráfico
+/**
+ * Atualiza as estatísticas de dias concluídos.
+ */
 function updateChartStats() {
     const completedDays = JSON.parse(localStorage.getItem('completedDays') || '{}');
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const completedCount = days.filter(day => completedDays[day]).length;
     
-    document.getElementById('totalDays').textContent = completedCount;
+    totalDaysSpan.textContent = completedCount;
+    
+    // Atualiza o gráfico de barras
+    days.forEach(day => {
+        const barElement = document.getElementById(day);
+        if (completedDays[day]) {
+            barElement.classList.add('completed');
+            // Simula altura da barra para visualização
+            barElement.style.height = '100%'; 
+        } else {
+            barElement.classList.remove('completed');
+            barElement.style.height = '0%';
+        }
+    });
 }
 
-// Função para enviar mensagens no chat
+/**
+ * Envia uma mensagem no chat.
+ */
 function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const message = input.value.trim();
+    const message = messageInput.value.trim();
     
     if (message) {
-        // Cria elemento da mensagem
-        const chatBox = document.getElementById('chatBox');
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message';
-        messageDiv.textContent = message;
-        
-        chatBox.appendChild(messageDiv);
-        input.value = '';
+        appendMessage(message, 'user');
+        messageInput.value = '';
         
         // Simula resposta do treinador
         setTimeout(() => {
-            const coachMessage = document.createElement('div');
-            coachMessage.className = 'message';
-            coachMessage.textContent = 'Resposta do treinador: ' + generateCoachResponse(message);
-            chatBox.appendChild(coachMessage);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            const coachResponse = generateCoachResponse(message);
+            appendMessage(coachResponse, 'coach');
         }, 1000);
     }
 }
 
-// Gera resposta automática para mensagens
-function generateCoachResponse(userMessage) {
-    // Simula processamento simples
-    return userMessage.includes('jejum') ? 'O jejum intermitente pode ser eficaz, mas priorize sua energia para treinos.' :
-           userMessage.includes('dieta') ? 'Mantenha uma dieta equilibrada com carboidratos complexos e proteínas magras.' :
-           userMessage.includes('pernas') ? 'Mantenha a postura ereta durante os agachamentos e não descuide da hidratação.' :
-           'Agende uma conversa para maiores esclarecimentos!';
+/**
+ * Adiciona uma mensagem ao chat.
+ * @param {string} text - O texto da mensagem.
+ * @param {string} sender - 'user' ou 'coach'.
+ */
+function appendMessage(text, sender) {
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    messageDiv.textContent = text;
+    
+    chatBox.appendChild(messageDiv);
+    chatBox.scrollTop = chatBox.scrollHeight; // Rola para a última mensagem
 }
 
-// Carrega histórico de mensagens
+/**
+ * Gera uma resposta automática do treinador (simulação).
+ * @param {string} userMessage - Mensagem do usuário.
+ * @returns {string} - Resposta do treinador.
+ */
+function generateCoachResponse(userMessage) {
+    const lowerCaseMessage = userMessage.toLowerCase();
+    if (lowerCaseMessage.includes('jejum')) {
+        return 'O jejum intermitente pode ser eficaz, mas priorize sua energia para treinos.';
+    } else if (lowerCaseMessage.includes('dieta')) {
+        return 'Mantenha uma dieta equilibrada com carboidratos complexos e proteínas magras.';
+    } else if (lowerCaseMessage.includes('pernas')) {
+        return 'Mantenha a postura ereta durante os agachamentos e não descuide da hidratação.';
+    } else {
+        return 'Agende uma conversa para maiores esclarecimentos!';
+    }
+}
+
+/**
+ * Carrega o histórico de mensagens do chat.
+ */
 function loadChatHistory() {
     // Simula carregamento de histórico
-    const chatBox = document.getElementById('chatBox');
     const history = [
-        {user: 'Treinador', text: 'Bem-vindo ao app! Você está pronto para alcançar seus objetivos.'},
-        {user: 'Você', text: 'Quando devo aumentar o peso nos treinos?'},
-        {user: 'Treinador', text: 'Aguarde até completar 4 semanas, aí faremos uma avaliação.'}
+        {sender: 'coach', text: 'Bem-vindo ao app! Você está pronto para alcançar seus objetivos.'},
+        {sender: 'user', text: 'Quando devo aumentar o peso nos treinos?'},
+        {sender: 'coach', text: 'Aguarde até completar 4 semanas, aí faremos uma avaliação.'}
     ];
     
+    chatBox.innerHTML = ''; // Limpa o chat antes de carregar
     history.forEach(msg => {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = 'message';
-        messageDiv.textContent = msg.text;
-        chatBox.appendChild(messageDiv);
+        appendMessage(msg.text, msg.sender);
     });
 }
 
-// Função para salvar métricas
+/**
+ * Salva uma nova métrica corporal (peso).
+ */
 function saveMetrics() {
-    const date = document.getElementById('metricsDate').value;
-    const weight = document.getElementById('weight').value;
+    const date = metricsDateInput.value;
+    const weight = weightInput.value;
     
     if (!date || !weight) {
-        alert('Preencha todos os campos!');
+        alert('Preencha a data e o peso!');
         return;
     }
     
-    // Cria objeto da métrica
     const metric = {
         date: date,
         weight: parseFloat(weight)
     };
     
-    // Carrega métricas existentes
+    // Carrega métricas existentes, garante que é um array
     const metrics = JSON.parse(localStorage.getItem('metrics') || '[]');
     
-    // Adiciona nova métrica
+    // Adiciona nova métrica e ordena por data (mais recente primeiro)
     metrics.push(metric);
+    metrics.sort((a, b) => new Date(b.date) - new Date(a.date));
     
     // Salva no localStorage
     localStorage.setItem('metrics', JSON.stringify(metrics));
     
-    // Atualiza gráfico
-    updateBars();
-    
-    // Atualiza lista de métricas
-    updateMetricsList(metric);
-    
-    // Atualiza estatísticas de peso perdido
+    // Atualiza a lista de métricas e estatísticas
+    updateMetricsList();
     updateWeightStats();
     
     // Limpa campos
-    document.getElementById('metricsDate').value = '';
-    document.getElementById('weight').value = '';
+    metricsDateInput.value = '';
+    weightInput.value = '';
 }
 
-// Atualiza a lista de métricas
-function updateMetricsList(metric) {
-    const container = document.getElementById('metricsList');
+/**
+ * Atualiza a lista de métricas exibida.
+ */
+function updateMetricsList() {
+    const metrics = JSON.parse(localStorage.getItem('metrics') || '[]');
+    metricsListContainer.innerHTML = '';
     
-    // Cria elemento para nova métrica
-    const metricDiv = document.createElement('div');
-    metricDiv.className = 'metric-item';
-    metricDiv.innerHTML = `<strong>${metric.date}</strong>: ${metric.weight} kg`;
-    
-    container.prepend(metricDiv);
+    metrics.forEach(metric => {
+        const metricDiv = document.createElement('div');
+        metricDiv.className = 'metric-item';
+        metricDiv.innerHTML = `<strong>${new Date(metric.date).toLocaleDateString('pt-BR')}</strong>: ${metric.weight} kg`;
+        metricsListContainer.appendChild(metricDiv);
+    });
 }
 
-// Atualiza estatísticas de peso
+/**
+ * Atualiza as estatísticas de peso perdido.
+ */
 function updateWeightStats() {
     const metrics = JSON.parse(localStorage.getItem('metrics') || '[]');
-    if (metrics.length < 2) return;
     
-    // Calcula diferença entre primeira e última métrica
-    const firstWeight = metrics[0].weight;
-    const lastWeight = metrics[metrics.length - 1].weight;
-    
-    // Calcula diferença e exibe
-    const diff = (firstWeight - lastWeight).toFixed(2);
-    document.getElementById('totalWeight').textContent = diff;
-}
-
-// Atualiza as barras do gráfico com base nos dados do usuário
-function updateBars() {
-    const metrics = JSON.parse(localStorage.getItem('metrics') || '[]');
-    
-    if (metrics.length > 0) {
-        metrics.forEach((metric, index) => {
-            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            if (index < days.length) {
-                const barElement = document.getElementById(days[index]);
-                barElement.classList.add('completed');
-                
-                // Calcula porcentagem com base no peso para preencher a barra
-                const percentage = Math.min(100, (metric.weight / 100) * 100);
-                barElement.style.height = `${percentage}%`;
-                barElement.style.backgroundColor = getColorFromPercentage(percentage);
-            }
-        });
+    if (metrics.length < 2) {
+        totalWeightSpan.textContent = '0.00';
+        return;
     }
+    
+    // A lista está ordenada por data decrescente, então o último é o mais antigo
+    const firstWeight = metrics[metrics.length - 1].weight; 
+    const lastWeight = metrics[0].weight; // O mais recente
+    
+    const diff = (firstWeight - lastWeight).toFixed(2);
+    totalWeightSpan.textContent = diff;
 }
 
-function getColorFromPercentage(percentage) {
-    // Linear gradient from red to green based on percentage
-    const red = percentage < 50 ? 255 : Math.round(255 * (1 - (percentage - 50) / 50) * 0.8);
-    const green = percentage < 50 ? Math.round(255 * (0.2 + (percentage / 50) * 0.8)) : 255;
-    return `rgb(${red}, ${green}, 0)`;
-}
-
-// Função para carregar todos os dados ao iniciar o dashboard
-document.getElementById('dashboard')?.addEventListener('load', () => {
+/**
+ * Carrega todos os dados do dashboard ao iniciar.
+ */
+function loadDashboardData() {
     loadCoachInstructions();
     loadChatHistory();
-    updateBars();
     updateChartStats();
-});
-
-// Notificação de instalação do PWA
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-    // Previne o prompt automático
-    e.preventDefault();
-    // Armazena o evento para usar posteriormente
-    deferredPrompt = e;
+    updateMetricsList();
+    updateWeightStats();
     
-    // Mostra o botão de instalação
-    const installBtn = document.getElementById('installBtn');
-    if (installBtn) {
-        installBtn.style.display = 'block';
-        installBtn.addEventListener('click', () => {
-            // Mostra o prompt de instalação
-            deferredPrompt.prompt();
-            // Espera a escolha do usuário
-            deferredPrompt.userChoice.then((choiceResult) => {
-                if (choiceResult.outcome === 'accepted') {
-                    console.log('Usuário aceitou a instalação');
-                }
-                deferredPrompt = null;
-            });
-        });
+    // Garante que a primeira aba seja exibida
+    showTab('instructions', navItems[0]);
+}
+
+// =================================================================
+// 5. Inicialização e Event Listeners
+// =================================================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 5.1. Event Listeners para Autenticação
+    authForm.addEventListener('submit', handleAuthSubmit);
+    
+    // 5.2. Event Listeners para Tabs de Autenticação
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.textContent.toLowerCase().includes('entrar') ? 'login' : 'register'));
+    });
+    
+    // 5.3. Event Listeners para Tipo de Input
+    inputTypeLabels.forEach(label => {
+        label.addEventListener('click', () => switchInputType(label.textContent.toLowerCase().includes('e-mail') ? 'email' : 'phone'));
+    });
+    
+    // 5.4. Event Listeners para Navegação Inferior
+    navItems.forEach(item => {
+        const tabId = item.getAttribute('data-tab');
+        item.addEventListener('click', (e) => showTab(tabId, e.currentTarget));
+    });
+    
+    // 5.5. Event Listeners para Treino
+    document.querySelectorAll('.workout-grid button').forEach(btn => {
+        const day = btn.getAttribute('data-day');
+        btn.addEventListener('click', () => markAsCompleted(day));
+    });
+    
+    // 5.6. Event Listeners para Chat
+    document.querySelector('#chat .chat-input button').addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+    
+    // 5.7. Event Listeners para Métricas
+    document.querySelector('.metrics-form button').addEventListener('click', saveMetrics);
+    
+    // 5.8. Inicialização da tela
+    switchTab('login'); // Inicia na aba de login
+    
+    // Se o usuário já estiver "logado" (simulação), carrega o dashboard
+    if (localStorage.getItem('user')) {
+        completeRegistration();
     }
 });
 
-// Monitora o offline e online para notificações
+// =================================================================
+// 6. Funções de Notificação (PWA)
+// =================================================================
+
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Aqui você pode mostrar um botão de instalação customizado se quiser
+    console.log('Evento beforeinstallprompt capturado.');
+});
+
 window.addEventListener('online', () => {
     showNotification('Você está online', 'Pode sincronizar seus dados agora!');
 });
@@ -346,28 +438,31 @@ window.addEventListener('offline', () => {
     showNotification('Você está offline', 'As atividades estão sendo salvas localmente e serão sincronizadas quando voltar online.');
 });
 
+/**
+ * Exibe uma notificação do sistema.
+ * @param {string} title - Título da notificação.
+ * @param {string} body - Corpo da notificação.
+ */
 function showNotification(title, body) {
     if (!("Notification" in window)) {
-        console.log('Este navegador não suporta notificações');
+        console.warn('Este navegador não suporta notificações');
         return;
     }
     
     if (Notification.permission === "granted") {
         navigator.serviceWorker.getRegistration().then(registration => {
-            registration.showNotification(title, {
-                body: body,
-                icon: 'icons/icon-192x192.png'
-            });
+            if (registration) {
+                registration.showNotification(title, {
+                    body: body,
+                    icon: 'icons/icon-192x192.png'
+                });
+            }
         });
     } else if (Notification.permission !== "denied") {
         Notification.requestPermission().then(permission => {
             if (permission === "granted") {
-                navigator.serviceWorker.getRegistration().then(registration => {
-                    registration.showNotification(title, {
-                        body: body,
-                        icon: 'icons/icon-192x192.png'
-                    });
-                });
+                // Tenta mostrar a notificação novamente
+                showNotification(title, body);
             }
         });
     }
