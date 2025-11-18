@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fit Training</title>
+    <title>Fit Training - PWA</title>
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="style.css">
     <meta name="theme-color" content="#1a1a1a">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 </head>
 <body>
     <!-- Tela de Boas Vindas -->
@@ -17,8 +18,8 @@
         </div>
         <div class="auth-container" id="authContainer">
             <div class="tabs">
-                <button class="tab active" onclick="switchTab('login')">Entrar</button>
-                <button class="tab" onclick="switchTab('register')">Cadastrar</button>
+                <button class="tab active" data-tab-type="login">Entrar</button>
+                <button class="tab" data-tab-type="register">Cadastrar</button>
             </div>
             <form id="authForm">
                 <div class="input-group">
@@ -27,8 +28,8 @@
                 </div>
                 <div class="input-group">
                     <div class="input-tabs">
-                        <span class="tab-label active" onclick="switchInputType('email')">E-mail</span>
-                        <span class="tab-label" onclick="switchInputType('phone')">Telefone</span>
+                        <span class="tab-label active" data-input-type="email">E-mail</span>
+                        <span class="tab-label" data-input-type="phone">Telefone</span>
                     </div>
                     <input type="text" id="emailInput" required>
                 </div>
@@ -55,48 +56,28 @@
                 <h2>Estatísticas de Treino</h2>
                 <div class="chart-summary">
                     <div class="stat-box">
-                        <span id="totalDays">0</span> dias treinados
+                        <span id="totalDays">0</span> dias concluídos
                     </div>
                     <div class="stat-box">
-                        <span id="totalWeight">0</span> kg perdidos
+                        <span id="totalWeight">0.00</span> kg perdidos
                     </div>
                 </div>
             </div>
             <div class="bar-chart">
-                <div class="chart-bar" id="sunday"></div>
-                <div class="chart-bar" id="monday"></div>
-                <div class="chart-bar" id="tuesday"></div>
-                <div class="chart-bar" id="wednesday"></div>
-                <div class="chart-bar" id="thursday"></div>
-                <div class="chart-bar" id="friday"></div>
-                <div class="chart-bar" id="saturday"></div>
-            </div>
-        </div>
-
-        <!-- Navegação Inferior -->
-        <div class="bottom-nav">
-            <div class="nav-item" onclick="showTab('instructions')">
-                <div class="icon">&#128221;</div>
-                <span>Instruções</span>
-            </div>
-            <div class="nav-item" onclick="showTab('workout')">
-                <div class="icon">&#128421;</div>
-                <span>Treino</span>
-            </div>
-            <div class="nav-item" onclick="showTab('chat')">
-                <div class="icon">&#128172;</div>
-                <span>Chat</span>
-            </div>
-            <div class="nav-item" onclick="showTab('metrics')">
-                <div class="icon">&#128081;</div>
-                <span>Métricas</span>
+                <div class="chart-bar" id="sunday">Dom</div>
+                <div class="chart-bar" id="monday">Seg</div>
+                <div class="chart-bar" id="tuesday">Ter</div>
+                <div class="chart-bar" id="wednesday">Qua</div>
+                <div class="chart-bar" id="thursday">Qui</div>
+                <div class="chart-bar" id="friday">Sex</div>
+                <div class="chart-bar" id="saturday">Sáb</div>
             </div>
         </div>
 
         <!-- Conteúdo das Abas -->
         <div class="tab-content">
             <!-- Instruções -->
-            <div id="instructions" class="content-section hidden">
+            <div id="instructions" class="content-section active">
                 <h3>Instruções do Treinador</h3>
                 <p>Veja aqui as orientações diárias do seu treinador:</p>
                 <ul id="coachInstructions">
@@ -106,37 +87,37 @@
 
             <!-- Treino -->
             <div id="workout" class="content-section hidden">
-                <h3>Routine Semanal</h3>
+                <h3>Rotina Semanal</h3>
                 <div class="workout-grid">
                     <div class="card">
                         <h4>Segunda</h4>
                         <p>Peito & Triceps</p>
-                        <button onclick="markAsCompleted('monday')">Marcar Como Concluído</button>
+                        <button data-day="monday">Marcar Concluído</button>
                     </div>
                     <div class="card">
                         <h4>Terça</h4>
                         <p>Costas & Biceps</p>
-                        <button onclick="markAsCompleted('tuesday')">Marcar Como Concluído</button>
+                        <button data-day="tuesday">Marcar Concluído</button>
                     </div>
                     <div class="card">
                         <h4>Quarta</h4>
                         <p>Pernas</p>
-                        <button onclick="markAsCompleted('wednesday')">Marcar Como Concluído</button>
+                        <button data-day="wednesday">Marcar Concluído</button>
                     </div>
                     <div class="card">
                         <h4>Quinta</h4>
                         <p>Ombro & Abdominal</p>
-                        <button onclick="markAsCompleted('thursday')">Marcar Como Concluído</button>
+                        <button data-day="thursday">Marcar Concluído</button>
                     </div>
                     <div class="card">
                         <h4>Sexta</h4>
                         <p>HIIT</p>
-                        <button onclick="markAsCompleted('friday')">Marcar Como Concluído</button>
+                        <button data-day="friday">Marcar Concluído</button>
                     </div>
                     <div class="card">
                         <h4>Sábado</h4>
-                        <p>Libre</p>
-                        <button onclick="markAsCompleted('saturday')">Marcar Como Concluído</button>
+                        <p>Livre</p>
+                        <button data-day="saturday">Marcar Concluído</button>
                     </div>
                 </div>
             </div>
@@ -149,7 +130,7 @@
                 </div>
                 <div class="chat-input">
                     <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
-                    <button onclick="sendMessage()">Enviar</button>
+                    <button>Enviar</button>
                 </div>
             </div>
 
@@ -158,18 +139,38 @@
                 <h3>Métricas Corporais</h3>
                 <div class="metrics-form">
                     <div class="input-group">
-                        <label>Data</label>
+                        <label for="metricsDate">Data</label>
                         <input type="date" id="metricsDate">
                     </div>
                     <div class="input-group">
-                        <label>Peso (kg)</label>
+                        <label for="weight">Peso (kg)</label>
                         <input type="number" id="weight" step="0.1">
                     </div>
-                    <button onclick="saveMetrics()">Salvar Métrica</button>
+                    <button class="auth-btn">Salvar Métrica</button>
                 </div>
                 <div class="metrics-list" id="metricsList">
                     <!-- Métricas salvas aparecerão aqui -->
                 </div>
+            </div>
+        </div>
+        
+        <!-- Navegação Inferior -->
+        <div class="bottom-nav">
+            <div class="nav-item active" data-tab="instructions">
+                <div class="icon">&#128221;</div>
+                <span>Instruções</span>
+            </div>
+            <div class="nav-item" data-tab="workout">
+                <div class="icon">&#128421;</div>
+                <span>Treino</span>
+            </div>
+            <div class="nav-item" data-tab="chat">
+                <div class="icon">&#128172;</div>
+                <span>Chat</span>
+            </div>
+            <div class="nav-item" data-tab="metrics">
+                <div class="icon">&#128081;</div>
+                <span>Métricas</span>
             </div>
         </div>
     </div>
