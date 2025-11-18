@@ -1,0 +1,378 @@
+:root {
+    --dark-gray: #1a1a1a;
+    --gray: #2d2d2d;
+    --light-gray: #4c4c4c;
+    --primary-color: #4caf50;
+    --text-color: #ffffff;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--dark-gray);
+    color: var(--text-color);
+    overflow: hidden;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Animação da tela inicial */
+.welcome-screen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: var(--dark-gray);
+    animation: fadeIn 3s ease-in-out;
+    z-index: 2;
+}
+
+@keyframes fadeIn {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.dumbbell-animation {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.dumbbell-bar {
+    width: 60px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 4px;
+    transform: translateY(-30px);
+    animation: lift 3s ease-out forwards;
+}
+
+@keyframes lift {
+    from {transform: translateY(0);}
+    to {transform: translateY(-50px);}
+}
+
+.dumbbell-text {
+    font-weight: bold;
+    margin-top: 40px;
+    animation: slideIn 2s ease-in-out;
+}
+
+@keyframes slideIn {
+    from {transform: translateY(-50px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+}
+
+.auth-container {
+    margin-top: 20px;
+    padding: 20px;
+    height: auto;
+    background: var(--gray);
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    animation: fadeInUp 1s ease-in-out;
+}
+
+@keyframes fadeInUp {
+    from {transform: translateY(50px); opacity: 0;}
+    to {transform: translateY(0); opacity: 1;}
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 20px;
+}
+
+.tab {
+    background: transparent;
+    border: none;
+    color: var(--text-color);
+    font-size: 1.1rem;
+    padding: 10px 0;
+    flex: 1;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.tab.active {
+    border-bottom: 2px solid var(--primary-color);
+    color: var(--primary-color);
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    background: var(--gray);
+    border: none;
+    border-bottom: 2px solid var(--light-gray);
+    color: var(--text-color);
+    border-radius: 0;
+    font-size: 1rem;
+}
+
+input:focus {
+    outline: none;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+.auth-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--primary-color);
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s ease;
+}
+
+.auth-btn:hover {
+    background: #45a049;
+}
+
+.tabs,
+.input-tabs {
+    border-bottom: 1px solid var(--light-gray);
+}
+
+.tab-label,
+.input-tabs .tab-label {
+    display: inline-block;
+    margin-right: 20px;
+    padding: 10px 0;
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.tab-label.active {
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Dashboard */
+.dashboard {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    z-index: 1;
+}
+
+/* Gráfico */
+.chart-container {
+    background: var(--gray);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    flex: 2;
+}
+
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.stat-box {
+    background: var(--dark-gray);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    width: 48%;
+    font-size: 0.9rem;
+}
+
+.bar-chart {
+    display: flex;
+    justify-content: space-between;
+    height: 150px;
+    background: #000;
+    border-radius: 5px;
+    padding: 5px;
+    position: relative;
+}
+
+.chart-bar {
+    width: 13%;
+    height: 0%;
+    background: transparent;
+    border-radius: 2px;
+    transition: height 0.5s ease, background 0.3s ease;
+    position: relative;
+}
+
+.chart-bar.completed {
+    background: var(--primary-color);
+    animation: grow 1s ease-out;
+}
+
+@keyframes grow {
+    from {height: 0%;}
+    to {height: 100%;}
+}
+
+/* Navegação inferior */
+.bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    background: var(--gray);
+    padding: 10px 0;
+    border-radius: 20px;
+    height: 60px;
+    margin-top: 10px;
+}
+
+.nav-item {
+    flex: 1;
+    text-align: center;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.nav-item:hover {
+    transform: scale(1.1);
+    transition: transform 0.2s ease;
+}
+
+.icon {
+    font-size: 1.5rem;
+    margin-bottom: 3px;
+}
+
+/* Conteúdo das abas */
+.tab-content {
+    flex: 3;
+    overflow-y: auto;
+    margin-top: 10px;
+    padding: 10px;
+}
+
+.content-section {
+    background: var(--gray);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+/* Seção de Treino */
+.workout-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.card {
+    background: var(--dark-gray);
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+}
+
+.card button {
+    margin-top: 10px;
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.card button:hover {
+    background: #45a049;
+}
+
+/* Chat */
+.chat-box {
+    background: var(--dark-gray);
+    height: 120px;
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.message {
+    margin: 5px 0;
+    padding: 8px;
+    background: var(--light-gray);
+    max-width: 80%;
+    border-radius: 10px;
+}
+
+.chat-input {
+    display: flex;
+    margin-top: 10px;
+}
+
+.chat-input input {
+    flex: 1;
+    margin-right: 10px;
+}
+
+.chat-input button {
+    background: var(--primary-color);
+    color: var(--text-color);
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.chat-input button:hover {
+    background: #45a049;
+}
+
+/* Métricas */
+.metrics-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.metrics-list {
+    background: var(--dark-gray);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.metric-item {
+    padding: 5px 0;
+    border-bottom: 1px solid var(--light-gray);
+}
+
+/* Responsividade */
+@media (max-height: 500px) {
+    .bottom-nav {
+        height: 50px;
+    }
+}
